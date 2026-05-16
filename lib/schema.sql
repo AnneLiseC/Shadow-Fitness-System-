@@ -1,5 +1,5 @@
 -- Shadow Fitness System — Schema PostgreSQL 17 (Neon)
--- Auth gérée par Neon Backend Services (Stack Auth)
+-- Utilisateur unique : user_id TEXT = 'anne-lise' (pas d'auth externe)
 
 CREATE TABLE IF NOT EXISTS profil_chasseur (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS sessions (
   xp_gagne INTEGER DEFAULT 0,
   completion_pct NUMERIC(5,2) DEFAULT 0,
   quete_urgente BOOLEAN DEFAULT false,
-  statut TEXT DEFAULT 'en_cours'
+  statut TEXT DEFAULT 'en_cours',
+  created_at TIMESTAMPTZ DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_sessions_user_date ON sessions(user_id, date);
@@ -58,7 +59,8 @@ CREATE TABLE IF NOT EXISTS quetes (
   statut TEXT DEFAULT 'en_cours',
   description TEXT,
   xp_recompense INTEGER DEFAULT 100,
-  expire_at TIMESTAMPTZ
+  expire_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS progression_exercice (
@@ -149,6 +151,11 @@ CREATE TABLE IF NOT EXISTS recettes (
   sans_saumon BOOLEAN DEFAULT true,
   type_repas TEXT
 );
+
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT now();
+ALTER TABLE quetes ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT now();
+INSERT INTO profil_chasseur (user_id, prenom) VALUES ('anne-lise', 'Anne-Lise')
+ON CONFLICT (user_id) DO NOTHING;
 
 -- Seed jours de repos fixes (globaux, sans user_id)
 INSERT INTO jours_repos (date, motif) VALUES
