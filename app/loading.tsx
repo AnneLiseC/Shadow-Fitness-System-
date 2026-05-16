@@ -1,8 +1,4 @@
-export const dynamic = 'force-dynamic';
-import { Suspense } from 'react';
-import OnboardingClient from './OnboardingClient';
-
-function OnboardingFallback() {
+export default function Loading() {
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
@@ -10,13 +6,5 @@ function OnboardingFallback() {
         <p className="text-violet-400 font-orbitron text-xs uppercase tracking-widest">Chargement...</p>
       </div>
     </div>
-  );
-}
-
-export default function OnboardingPage() {
-  return (
-    <Suspense fallback={<OnboardingFallback />}>
-      <OnboardingClient />
-    </Suspense>
   );
 }
