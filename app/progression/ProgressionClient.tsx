@@ -62,16 +62,6 @@ interface ProgressionClientProps {
   stravaAthleteId?: number;
 }
 
-const SESSIONS_FICTIVES = [
-  { date: "2026-05-09", completion_pct: 80, xp_gagne: 40, statut: "complete" },
-  { date: "2026-05-10", completion_pct: 100, xp_gagne: 50, statut: "complete" },
-  { date: "2026-05-11", completion_pct: 60, xp_gagne: 30, statut: "partiel" },
-  { date: "2026-05-12", completion_pct: 100, xp_gagne: 50, statut: "complete" },
-  { date: "2026-05-13", completion_pct: 0, xp_gagne: 0, statut: "manquee" },
-  { date: "2026-05-14", completion_pct: 90, xp_gagne: 45, statut: "complete" },
-  { date: "2026-05-15", completion_pct: 100, xp_gagne: 50, statut: "complete" },
-];
-
 export default function ProgressionClient({
   prenom,
   grade,
@@ -87,12 +77,11 @@ export default function ProgressionClient({
 }: ProgressionClientProps) {
   const gradeColor = GRADE_COLORS[grade];
 
-  const displaySessions = sessions.length > 0 ? sessions : SESSIONS_FICTIVES;
-  const completedSessions = displaySessions.filter(
+  const completedSessions = sessions.filter(
     (s) => s.statut === "complete"
   ).length;
 
-  const sessionChartData = displaySessions.slice(-14).map((s) => ({
+  const sessionChartData = sessions.slice(-14).map((s) => ({
     date: new Date(s.date).toLocaleDateString("fr-FR", {
       day: "2-digit",
       month: "short",
@@ -342,7 +331,7 @@ export default function ProgressionClient({
               const d = new Date();
               d.setDate(d.getDate() - (27 - i));
               const dateStr = d.toISOString().split("T")[0];
-              const session = displaySessions.find((s) => s.date === dateStr);
+              const session = sessions.find((s) => s.date === dateStr);
               const intensity = session
                 ? session.completion_pct >= 100
                   ? 4
