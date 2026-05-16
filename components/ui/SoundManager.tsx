@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useContext, useCallback, useRef, useEffect } from 'react';
+import { createContext, useContext, useCallback, useRef } from 'react';
 
 type SoundType = 'levelup' | 'quest' | 'complete' | 'punishment' | 'xp' | 'tap' | 'transform' | 'meal' | 'water' | 'strava';
 

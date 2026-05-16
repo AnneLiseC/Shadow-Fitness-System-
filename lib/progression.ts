@@ -77,7 +77,7 @@ export function calculateRunDistance(semaine: number, phase: number): number {
 
 export function shouldProgressExercice(
   recentSessions: Array<{ reps_realise: number; reps_objectif: number }>,
-  niveau: number
+  _niveau: number
 ): boolean {
   if (recentSessions.length < 3) return false;
   const last3 = recentSessions.slice(-3);

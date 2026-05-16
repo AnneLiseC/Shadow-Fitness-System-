@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { query, queryOne } from '@/lib/db';
+import { query } from '@/lib/db';
 import { sendPushToUser } from '@/lib/push';
-import { nowParis, todayISO } from '@/lib/utils';
+import { nowParis } from '@/lib/utils';
 
 export const runtime = 'nodejs';
 

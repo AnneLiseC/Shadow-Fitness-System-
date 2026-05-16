@@ -14,17 +14,11 @@ export async function POST(req: NextRequest) {
   // Calculer complétion
   const exercices = ['poignets', 'pompes', 'abdos', 'squats', 'course'];
   const doneCount = exercices.filter(ex => logs[ex]?.done).length;
-  const douleurs = exercices.filter(ex => logs[ex]?.douleur);
-
-  // Vérifier la règle 95% (hors douleur/repos)
-  const obligatoires = ['abdos', 'squats', 'course'].filter(ex => !douleurs.includes(ex));
-  const completedObligatoires = obligatoires.filter(ex => logs[ex]?.done);
   const completionPct = exercices.length > 0
     ? Math.round((doneCount / exercices.length) * 100)
     : 0;
 
   let xpGagne = 100;
-  const isUrgente = false; // TODO: check quête urgente active
 
   // XP x2 si quête urgente
   const queteUrgente = await queryOne(
@@ -45,8 +39,8 @@ export async function POST(req: NextRequest) {
     [user.id, yesterdayISO]
   );
 
-  let newStreak = sessionHier ? (profil?.streak_actuel || 0) + 1 : 1;
-  let newRecord = Math.max(newStreak, profil?.streak_record || 0);
+  const newStreak = sessionHier ? (profil?.streak_actuel || 0) + 1 : 1;
+  const newRecord = Math.max(newStreak, profil?.streak_record || 0);
 
   // Bonus streak 7j
   if (newStreak % 7 === 0) xpGagne += 50;

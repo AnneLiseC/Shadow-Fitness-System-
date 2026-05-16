@@ -2,14 +2,13 @@ export const dynamic = 'force-dynamic';
 import { stackServerApp } from '@/lib/stack';
 import { redirect } from 'next/navigation';
 import { queryOne, query } from '@/lib/db';
-import { getGradeFromXP, GRADE_TITLES } from '@/lib/grades';
-import { todayISO, getISOWeek } from '@/lib/utils';
+import { getGradeFromXP } from '@/lib/grades';
+import { todayISO } from '@/lib/utils';
 import DashboardClient from './DashboardClient';
 
 export default async function DashboardPage() {
   const user = await stackServerApp.getUser({ or: 'redirect' });
   const today = todayISO();
-  const week = getISOWeek();
 
   const profil = await queryOne<{
     prenom: string; grade_actuel: string; xp_total: number;

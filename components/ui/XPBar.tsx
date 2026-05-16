@@ -1,6 +1,6 @@
 'use client';
 import { motion } from 'framer-motion';
-import { Grade, getXPProgress, getXPForNextGrade, XP_THRESHOLDS } from '@/lib/grades';
+import { Grade, getXPProgress, getXPForNextGrade } from '@/lib/grades';
 
 interface XPBarProps {
   xp: number;
@@ -10,7 +10,6 @@ interface XPBarProps {
 export default function XPBar({ xp, grade }: XPBarProps) {
   const progress = getXPProgress(xp, grade);
   const nextXP = getXPForNextGrade(grade);
-  const currentXP = XP_THRESHOLDS[grade];
 
   return (
     <div className="w-full">

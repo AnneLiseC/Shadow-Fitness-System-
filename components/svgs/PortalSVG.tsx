@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 export default function PortalSVG({ size = 200, active = false }: { size?: number; active?: boolean }) {
   const runeRef = useRef<SVGGElement>(null);

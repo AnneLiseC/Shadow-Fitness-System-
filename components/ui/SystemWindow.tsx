@@ -1,6 +1,6 @@
 'use client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode } from 'react';
 
 interface SystemWindowProps {
   title: string;
@@ -16,7 +16,6 @@ export default function SystemWindow({
   children,
   visible = true,
   className = '',
-  typewriter = false,
   urgent = false,
 }: SystemWindowProps) {
   return (

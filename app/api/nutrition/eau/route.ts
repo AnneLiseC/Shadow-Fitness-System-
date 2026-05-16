@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ success: true });
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   const user = await stackServerApp.getUser();
   if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
 

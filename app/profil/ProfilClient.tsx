@@ -33,7 +33,7 @@ interface ProfilClientProps {
 export default function ProfilClient({
   prenom, email, grade, xp, streak, streakRecord,
   heureRappel, sonsActifs, notifsRepas, notifsEau, phase,
-  stravaConnected, stravaAthleteId, totalSessions, joursActifs, membreDepuis
+  stravaConnected, stravaAthleteId, totalSessions, membreDepuis
 }: ProfilClientProps) {
   const [prenomEdit, setPrenomEdit] = useState(prenom);
   const [heureEdit, setHeureEdit] = useState(heureRappel);
