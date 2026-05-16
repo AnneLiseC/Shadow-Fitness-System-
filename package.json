@@ -13,7 +13,6 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@stackframe/stack": "^2.8.89",
     "@types/howler": "^2.2.12",
     "@types/pg": "^8.20.0",
     "@types/web-push": "^3.6.4",

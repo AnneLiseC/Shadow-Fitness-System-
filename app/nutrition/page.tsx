@@ -1,17 +1,17 @@
 export const dynamic = 'force-dynamic';
-import { stackServerApp } from '@/lib/stack';
 import { redirect } from 'next/navigation';
 import { query, queryOne } from '@/lib/db';
 import { todayISO } from '@/lib/utils';
 import NutritionClient from './NutritionClient';
 
+const USER_ID = 'anne-lise';
+
 export default async function NutritionPage() {
-  const user = await stackServerApp.getUser({ or: 'redirect' });
   const today = todayISO();
 
   const profil = await queryOne<{ prenom: string }>(
     'SELECT prenom FROM profil_chasseur WHERE user_id = $1',
-    [user.id]
+    [USER_ID]
   );
 
   if (!profil) redirect('/onboarding');
@@ -27,7 +27,7 @@ export default async function NutritionPage() {
 
   const logsAujourd = await query<{ repas_type: string; statut: string; verres_eau: number }>(
     'SELECT repas_type, statut, verres_eau FROM nutrition_logs WHERE user_id = $1 AND date = $2',
-    [user.id, today]
+    [USER_ID, today]
   );
 
   const totalEau = logsAujourd.reduce((s, l) => s + (l.verres_eau || 0), 0);

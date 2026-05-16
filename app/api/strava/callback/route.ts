@@ -1,12 +1,10 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { stackServerApp } from '@/lib/stack';
 import { query } from '@/lib/db';
 
-export async function GET(req: NextRequest) {
-  const user = await stackServerApp.getUser();
-  if (!user) return NextResponse.redirect('/onboarding');
+const USER_ID = 'anne-lise';
 
+export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get('code');
   const error = searchParams.get('error');
@@ -36,7 +34,7 @@ export async function GET(req: NextRequest) {
      ON CONFLICT (user_id) DO UPDATE SET
        access_token = $2, refresh_token = $3, expires_at = $4, athlete_id = $5`,
     [
-      user.id,
+      USER_ID,
       data.access_token,
       data.refresh_token,
       new Date(data.expires_at * 1000).toISOString(),
