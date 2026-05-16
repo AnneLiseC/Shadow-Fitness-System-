@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   const now = nowParis();
   const hour = now.getHours();
 
-  if (hour < 20) return NextResponse.json({ skipped: 'trop tôt' });
+  if (hour < 23) return NextResponse.json({ skipped: 'trop tôt' });
 
   const joursOff = await query<{ date: string }>(
     'SELECT date FROM jours_repos WHERE user_id IS NULL'
