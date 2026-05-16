@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['pg', 'web-push'],
-  },
+  serverExternalPackages: ['pg', 'web-push'],
   images: {
     remotePatterns: [],
   },
