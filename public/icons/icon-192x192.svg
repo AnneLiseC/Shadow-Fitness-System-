@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <rect width="192" height="192" fill="#000000"/>
+  <polygon points="165.83628856117713,55.68000000000001 165.83628856117713,136.32 96,176.64 26.163711438822858,136.32 26.163711438822872,55.67999999999999 95.99999999999999,15.36" fill="#7c3aed" opacity="0.8"/>
+  <polygon points="165.83628856117713,55.68000000000001 165.83628856117713,136.32 96,176.64 26.163711438822858,136.32 26.163711438822872,55.67999999999999 95.99999999999999,15.36" fill="none" stroke="#06b6d4" stroke-width="3.84"/>
+  <text x="96" y="111.36" text-anchor="middle"
+    font-size="53.760000000000005" fill="#ffffff" font-family="monospace" font-weight="bold">S</text>
+</svg>
