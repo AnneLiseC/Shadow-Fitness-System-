@@ -14,7 +14,7 @@ import XPBar from '@/components/ui/XPBar';
 import WaterTracker from '@/components/ui/WaterTracker';
 import BottomNav from '@/components/ui/BottomNav';
 import { SoundProvider, useSound } from '@/components/ui/SoundManager';
-
+  
 interface DashboardClientProps {
   prenom: string;
   grade: Grade;
