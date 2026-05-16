@@ -17,6 +17,12 @@ import { SoundProvider, useSound } from "@/components/ui/SoundManager";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 import type { Slug } from "react-muscle-highlighter";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAppStore } from "@/lib/store";
+import gsap from "gsap";
 
 const Body = dynamic(() => import("react-muscle-highlighter"), { ssr: false });
 
@@ -395,12 +401,14 @@ function SeanceInner({
         setXpGagne(data.xp_gagne);
         setSaved(true);
         setShowSuccess(true);
+        // Sync XP dans Zustand
+        useAppStore.getState().addXP(data.xp_gagne);
+        // Animation level up GSAP
+        gsap.timeline()
+          .to(".grade-crystal", { scale: 1.5, rotation: 360, duration: 0.5, ease: "power2.out" })
+          .to(".grade-crystal", { scale: 1, duration: 0.3, ease: "back.out" });
         toast(`⚔️ Quête validée ! +${data.xp_gagne} XP`, {
-          style: {
-            background: "#0a0a1a",
-            color: "#06b6d4",
-            border: "1px solid #7c3aed",
-          },
+          style: { background: "#0a0a1a", color: "#06b6d4", border: "1px solid #7c3aed" },
         });
         setTimeout(() => setShowSuccess(false), 5000);
       }
@@ -775,55 +783,75 @@ function SeanceInner({
   );
 }
 
+// ── Schéma Zod pour le logger course ───────────────────────────
+const runSchema = z.object({
+  distance_km: z.number().min(0.1, "Min 0.1 km").max(50, "Max 50 km"),
+  duree_minutes: z.number().min(1, "Min 1 min").max(300, "Max 300 min"),
+  duree_secondes: z.number().min(0).max(59),
+});
+type RunForm = z.infer<typeof runSchema>;
+
 function ManualRunLogger({
   onSave,
 }: {
   onSave: (distKm: number, durSec: number) => void;
 }) {
-  const [dist, setDist] = useState(3);
-  const [min, setMin] = useState(22);
-  const [sec, setSec] = useState(0);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RunForm>({
+    resolver: zodResolver(runSchema),
+    defaultValues: { distance_km: 3, duree_minutes: 22, duree_secondes: 0 },
+  });
+
+  const onSubmit = (data: RunForm) => {
+    onSave(data.distance_km, data.duree_minutes * 60 + data.duree_secondes);
+  };
 
   return (
-    <div className="space-y-2">
-      <div className="flex gap-2 items-center">
-        <label className="text-xs text-gray-400 w-20">Distance (km)</label>
-        <input
-          type="number"
-          value={dist}
-          min="0.1"
-          step="0.1"
-          onChange={(e) => setDist(Number(e.target.value))}
-          className="flex-1 py-1.5 px-2 bg-black border border-gray-700 text-white rounded text-sm"
-        />
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+      <div className="flex gap-2 items-start">
+        <label className="text-xs text-gray-400 w-20 pt-2">Distance (km)</label>
+        <div className="flex-1">
+          <input
+            type="number"
+            step="0.1"
+            {...register("distance_km", { valueAsNumber: true })}
+            className="w-full py-1.5 px-2 bg-black border border-gray-700 text-white rounded text-sm"
+          />
+          {errors.distance_km && (
+            <p className="text-red-400 text-xs mt-0.5">{errors.distance_km.message}</p>
+          )}
+        </div>
       </div>
-      <div className="flex gap-2 items-center">
-        <label className="text-xs text-gray-400 w-20">Durée</label>
-        <input
-          type="number"
-          value={min}
-          min="0"
-          onChange={(e) => setMin(Number(e.target.value))}
-          className="w-16 py-1.5 px-2 bg-black border border-gray-700 text-white rounded text-sm"
-        />
-        <span className="text-gray-500 text-xs">min</span>
-        <input
-          type="number"
-          value={sec}
-          min="0"
-          max="59"
-          onChange={(e) => setSec(Number(e.target.value))}
-          className="w-16 py-1.5 px-2 bg-black border border-gray-700 text-white rounded text-sm"
-        />
-        <span className="text-gray-500 text-xs">sec</span>
+      <div className="flex gap-2 items-start">
+        <label className="text-xs text-gray-400 w-20 pt-2">Durée</label>
+        <div className="flex gap-1 items-center">
+          <input
+            type="number"
+            {...register("duree_minutes", { valueAsNumber: true })}
+            className="w-16 py-1.5 px-2 bg-black border border-gray-700 text-white rounded text-sm"
+          />
+          <span className="text-gray-500 text-xs">min</span>
+          <input
+            type="number"
+            {...register("duree_secondes", { valueAsNumber: true })}
+            className="w-14 py-1.5 px-2 bg-black border border-gray-700 text-white rounded text-sm"
+          />
+          <span className="text-gray-500 text-xs">sec</span>
+        </div>
       </div>
+      {errors.duree_minutes && (
+        <p className="text-red-400 text-xs">{errors.duree_minutes.message}</p>
+      )}
       <button
-        onClick={() => onSave(dist, min * 60 + sec)}
+        type="submit"
         className="w-full py-2 bg-orange-900 border border-orange-600 text-orange-300 text-sm font-orbitron uppercase rounded"
       >
         Logger la course
       </button>
-    </div>
+    </form>
   );
 }
 

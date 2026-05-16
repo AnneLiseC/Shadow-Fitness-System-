@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Orbitron, Rajdhani } from "next/font/google";
 import "./globals.css";
 import Providers from "@/lib/providers";
+import RunesParticles from "@/components/ui/RunesParticles";
+import GSAPEffects from "@/components/ui/GSAPEffects";
 
 const orbitron = Orbitron({
   subsets: ["latin"],
@@ -61,6 +63,8 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Shadow Fitness" />
       </head>
       <body className="bg-black text-white antialiased min-h-screen overflow-x-hidden">
+        <RunesParticles />
+        <GSAPEffects />
         <Providers>{children}</Providers>
       </body>
     </html>
