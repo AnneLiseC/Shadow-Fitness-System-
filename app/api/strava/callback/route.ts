@@ -5,12 +5,13 @@ import { query } from '@/lib/db';
 const USER_ID = 'anne-lise';
 
 export async function GET(req: NextRequest) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://shadow-fitness-system.vercel.app';
   const { searchParams } = new URL(req.url);
   const code = searchParams.get('code');
   const error = searchParams.get('error');
 
   if (error || !code) {
-    return NextResponse.redirect('/profil?strava=error');
+    return NextResponse.redirect(`${baseUrl}/profil?strava=error`);
   }
 
   const res = await fetch('https://www.strava.com/oauth/token', {
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
     }),
   });
 
-  if (!res.ok) return NextResponse.redirect('/profil?strava=error');
+  if (!res.ok) return NextResponse.redirect(`${baseUrl}/profil?strava=error`);
 
   const data = await res.json();
 
@@ -42,5 +43,5 @@ export async function GET(req: NextRequest) {
     ]
   );
 
-  return NextResponse.redirect('/profil?strava=success');
+  return NextResponse.redirect(`${baseUrl}/profil?strava=success`);
 }
