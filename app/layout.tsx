@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Orbitron, Rajdhani } from 'next/font/google';
 import './globals.css';
-import StackClientProvider from '@/components/ui/StackClientProvider';
+import PWAInit from '@/components/ui/PWAInit';
 
 const orbitron = Orbitron({
   subsets: ['latin'],
@@ -50,9 +50,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-title" content="Shadow Fitness" />
       </head>
       <body className="bg-black text-white antialiased min-h-screen overflow-x-hidden">
-        <StackClientProvider>
-          {children}
-        </StackClientProvider>
+        <PWAInit />
+        {children}
       </body>
     </html>
   );

@@ -1,13 +1,12 @@
 export const dynamic = 'force-dynamic';
-import { stackServerApp } from '@/lib/stack';
 import { redirect } from 'next/navigation';
 import { queryOne } from '@/lib/db';
 import { getGradeFromXP } from '@/lib/grades';
 import ProfilClient from './ProfilClient';
 
-export default async function ProfilPage() {
-  const user = await stackServerApp.getUser({ or: 'redirect' });
+const USER_ID = 'anne-lise';
 
+export default async function ProfilPage() {
   const profil = await queryOne<{
     prenom: string; xp_total: number; grade_actuel: string;
     streak_actuel: number; streak_record: number;
@@ -16,7 +15,7 @@ export default async function ProfilPage() {
     phase_entrainement: number; created_at: string;
   }>(
     'SELECT * FROM profil_chasseur WHERE user_id = $1',
-    [user.id]
+    [USER_ID]
   );
 
   if (!profil) redirect('/onboarding');
@@ -25,7 +24,7 @@ export default async function ProfilPage() {
 
   const stravaToken = await queryOne<{ athlete_id: number }>(
     'SELECT athlete_id FROM strava_tokens WHERE user_id = $1',
-    [user.id]
+    [USER_ID]
   );
 
   const statsGlobales = await queryOne<{
@@ -36,13 +35,12 @@ export default async function ProfilPage() {
        COALESCE(SUM(xp_gagne), 0) as total_xp,
        COUNT(DISTINCT date) as jours_actifs
      FROM sessions WHERE user_id = $1 AND statut = 'complete'`,
-    [user.id]
+    [USER_ID]
   );
 
   return (
     <ProfilClient
       prenom={profil.prenom}
-      email={user.primaryEmail || ''}
       grade={grade}
       xp={profil.xp_total}
       streak={profil.streak_actuel}

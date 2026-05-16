@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { useStackApp } from '@stackframe/stack';
 import type { Grade } from '@/lib/grades';
 import { GRADE_COLORS, GRADE_TITLES } from '@/lib/grades';
 import AvatarSVG from '@/components/svgs/AvatarSVG';
@@ -13,7 +12,6 @@ import RunesBg from '@/components/svgs/RunesBg';
 
 interface ProfilClientProps {
   prenom: string;
-  email: string;
   grade: Grade;
   xp: number;
   streak: number;
@@ -31,7 +29,7 @@ interface ProfilClientProps {
 }
 
 export default function ProfilClient({
-  prenom, email, grade, xp, streak, streakRecord,
+  prenom, grade, xp, streak, streakRecord,
   heureRappel, sonsActifs, notifsRepas, notifsEau, phase,
   stravaConnected, stravaAthleteId, totalSessions, membreDepuis
 }: ProfilClientProps) {
@@ -44,7 +42,6 @@ export default function ProfilClient({
   const [saved, setSaved] = useState(false);
 
   const router = useRouter();
-  const app = useStackApp();
   const gradeColor = GRADE_COLORS[grade];
 
   async function saveSettings() {
@@ -199,17 +196,9 @@ export default function ProfilClient({
         </SystemWindow>
 
         {/* Infos compte */}
-        <div className="mb-4 bg-gray-900 bg-opacity-80 border border-gray-800 rounded p-3">
-          <p className="text-xs text-gray-500">Email: {email}</p>
-          <p className="text-xs text-gray-500 mt-1">Membre depuis: {membreDate}</p>
+        <div className="mb-6 bg-gray-900 bg-opacity-80 border border-gray-800 rounded p-3">
+          <p className="text-xs text-gray-500">Membre depuis: {membreDate}</p>
         </div>
-
-        {/* Déconnexion */}
-        <button
-          onClick={() => app.signOut()}
-          className="w-full py-3 mb-6 border border-red-900 text-red-600 font-orbitron uppercase tracking-wider rounded hover:bg-red-950 transition-colors text-sm">
-          Déconnexion
-        </button>
       </div>
 
       <BottomNav />

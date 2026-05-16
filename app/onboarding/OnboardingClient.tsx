@@ -1,30 +1,20 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { useUser, useStackApp } from '@stackframe/stack';
 import PortalSVG from '@/components/svgs/PortalSVG';
 import RunesBg from '@/components/svgs/RunesBg';
 import SystemWindow from '@/components/ui/SystemWindow';
 
-type Step = 'welcome' | 'auth' | 'profile' | 'pwa' | 'notifications' | 'strava' | 'complete';
+type Step = 'welcome' | 'profile' | 'pwa' | 'notifications' | 'strava' | 'complete';
 
 export default function OnboardingClient() {
   const [step, setStep] = useState<Step>('welcome');
   const [prenom, setPrenom] = useState('Anne-Lise');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const user = useUser();
-  const app = useStackApp();
-
-  useEffect(() => {
-    if (user && step === 'auth') {
-      setStep('profile');
-    }
-  }, [user, step]);
 
   async function handleProfile() {
-    if (!user) return;
     setLoading(true);
     try {
       await fetch('/api/profile', {
@@ -83,29 +73,10 @@ export default function OnboardingClient() {
             </p>
           </div>
         </SystemWindow>
-        <motion.button whileTap={{ scale: 0.95 }} onClick={() => setStep('auth')}
+        <motion.button whileTap={{ scale: 0.95 }} onClick={() => setStep('profile')}
           className="w-full max-w-xs py-4 bg-violet-700 border border-violet-400 text-white font-orbitron uppercase tracking-widest rounded pulse-glow hover:bg-violet-600 transition-colors">
           Commencer l&apos;Éveil
         </motion.button>
-      </motion.div>
-    ),
-
-    auth: (
-      <motion.div key="auth" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -50 }} className="flex flex-col items-center gap-6 px-6 w-full max-w-sm">
-        <SystemWindow title="AUTHENTIFICATION CHASSEUSE" className="w-full">
-          <p className="text-gray-300 text-center mb-4">Le Système requiert ton identification.</p>
-          <div className="flex flex-col gap-3">
-            <motion.button whileTap={{ scale: 0.95 }} onClick={() => app.redirectToSignIn()}
-              className="w-full py-3 bg-cyan-900 border border-cyan-500 text-cyan-300 font-orbitron uppercase tracking-wider rounded hover:bg-cyan-800 transition-colors glow-cyan">
-              Connexion
-            </motion.button>
-            <motion.button whileTap={{ scale: 0.95 }} onClick={() => app.redirectToSignUp()}
-              className="w-full py-3 bg-violet-900 border border-violet-500 text-violet-300 font-orbitron uppercase tracking-wider rounded hover:bg-violet-800 transition-colors glow-violet">
-              Créer un compte
-            </motion.button>
-          </div>
-        </SystemWindow>
       </motion.div>
     ),
 
@@ -244,7 +215,7 @@ export default function OnboardingClient() {
     ),
   };
 
-  const stepOrder: Step[] = ['welcome', 'auth', 'profile', 'pwa', 'notifications', 'strava', 'complete'];
+  const stepOrder: Step[] = ['welcome', 'profile', 'pwa', 'notifications', 'strava', 'complete'];
   const currentIdx = stepOrder.indexOf(step);
 
   return (
