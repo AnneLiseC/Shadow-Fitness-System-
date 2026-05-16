@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS plan_nutrition (
 
 CREATE TABLE IF NOT EXISTS recettes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  nom TEXT NOT NULL,
+  nom TEXT NOT NULL UNIQUE,
   temps_preparation INTEGER,
   ingredients JSONB NOT NULL DEFAULT '[]',
   etapes JSONB NOT NULL DEFAULT '[]',

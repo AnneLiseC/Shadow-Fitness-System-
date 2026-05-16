@@ -202,7 +202,7 @@ export default function ProgressionClient({
               progressions.map((p) => {
                 const maxLevel =
                   p.type_exercice === "pompes"
-                    ? 16
+                    ? 12
                     : p.type_exercice === "abdos"
                       ? 8
                       : p.type_exercice === "squats"
@@ -247,7 +247,7 @@ export default function ProgressionClient({
                 current:
                   progressions.find((p) => p.type_exercice === "pompes")
                     ?.niveau_actuel || 1,
-                max: 16,
+                max: 12,
               },
               {
                 label: "100 Abdos",
