@@ -1,12 +1,13 @@
-'use client';
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import SystemWindow from '@/components/ui/SystemWindow';
-import WaterTracker from '@/components/ui/WaterTracker';
-import BottomNav from '@/components/ui/BottomNav';
-import RunesBg from '@/components/svgs/RunesBg';
+"use client";
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import SystemWindow from "@/components/ui/SystemWindow";
+import WaterTracker from "@/components/ui/WaterTracker";
+import BottomNav from "@/components/ui/BottomNav";
+import RunesBg from "@/components/svgs/RunesBg";
+import toast from "react-hot-toast";
 
-type RepasType = 'petit_dejeuner' | 'dejeuner' | 'collation' | 'diner';
+type RepasType = "petit_dejeuner" | "dejeuner" | "collation" | "diner";
 
 interface Recette {
   id: string;
@@ -21,14 +22,22 @@ interface Recette {
   type_repas: string;
 }
 
-const REPAS_LABELS: Record<RepasType, { label: string; heure: string; icon: string; kcal: number }> = {
-  petit_dejeuner: { label: 'Petit-déjeuner', heure: '7h00', icon: '🌅', kcal: 480 },
-  dejeuner: { label: 'Déjeuner', heure: '12h00', icon: '🍱', kcal: 530 },
-  collation: { label: 'Collation', heure: '18h15', icon: '🔥', kcal: 230 },
-  diner: { label: 'Dîner', heure: '20h30', icon: '🌙', kcal: 510 },
+const REPAS_LABELS: Record<
+  RepasType,
+  { label: string; heure: string; icon: string; kcal: number }
+> = {
+  petit_dejeuner: { label: "Petit-déjeuner", heure: "7h00", icon: "🌅", kcal: 480 },
+  dejeuner: { label: "Déjeuner", heure: "12h00", icon: "🍱", kcal: 530 },
+  collation: { label: "Collation", heure: "18h15", icon: "🔥", kcal: 230 },
+  diner: { label: "Dîner", heure: "20h30", icon: "🌙", kcal: 510 },
 };
 
-const REPAS_ORDER: RepasType[] = ['petit_dejeuner', 'dejeuner', 'collation', 'diner'];
+const REPAS_ORDER: RepasType[] = [
+  "petit_dejeuner",
+  "dejeuner",
+  "collation",
+  "diner",
+];
 
 interface NutritionClientProps {
   prenom: string;
@@ -37,16 +46,61 @@ interface NutritionClientProps {
   totalEau: number;
 }
 
-export default function NutritionClient({ prenom, recettes, repasStatuts, totalEau }: NutritionClientProps) {
+function NutriBadges({ recette }: { recette: Recette }) {
+  const badges = [
+    { icon: "🔥", label: "Kcal", value: recette.calories_approx, unit: "", color: "#f59e0b" },
+    { icon: "💪", label: "Protéines", value: recette.proteines_approx, unit: "g", color: "#06b6d4" },
+    { icon: "⚡", label: "Glucides", value: recette.glucides_approx, unit: "g", color: "#8b5cf6" },
+    { icon: "🫙", label: "Lipides", value: recette.lipides_approx, unit: "g", color: "#10b981" },
+  ];
+  return (
+    <div className="grid grid-cols-4 gap-1 mt-2">
+      {badges.map((b) => (
+        <div
+          key={b.label}
+          className="flex flex-col items-center py-1.5 px-1 rounded"
+          style={{ background: "#0a0a1a", border: "1px solid #1f2937" }}
+        >
+          <span className="text-base leading-tight">{b.icon}</span>
+          <span
+            className="font-orbitron text-xs font-bold leading-tight"
+            style={{ color: b.color }}
+          >
+            {b.value || "—"}{b.value ? b.unit : ""}
+          </span>
+          <span className="text-gray-600" style={{ fontSize: "8px" }}>
+            {b.label}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function NutritionClient({
+  prenom,
+  recettes,
+  repasStatuts,
+  totalEau,
+}: NutritionClientProps) {
   const [statuts, setStatuts] = useState<Record<string, string>>(repasStatuts);
   const [eau, setEau] = useState(totalEau);
   const [activeRecette, setActiveRecette] = useState<Recette | null>(null);
-  const [activeRepas, setActiveRepas] = useState<RepasType>('petit_dejeuner');
+  const [activeRepas, setActiveRepas] = useState<RepasType>("petit_dejeuner");
 
-  const recettesParType = (type: string) => recettes.filter(r => r.type_repas === type);
+  // Déduplique par id pour éviter les doublons d'affichage
+  const recettesParType = (type: string) => {
+    const seen = new Set<string>();
+    return recettes.filter((r) => {
+      if (r.type_repas !== type) return false;
+      if (seen.has(r.id)) return false;
+      seen.add(r.id);
+      return true;
+    });
+  };
 
   const totalKcal = REPAS_ORDER.reduce((sum, repas) => {
-    if (statuts[repas] === 'fait') return sum + REPAS_LABELS[repas].kcal;
+    if (statuts[repas] === "fait") return sum + REPAS_LABELS[repas].kcal;
     return sum;
   }, 0);
 
@@ -54,20 +108,25 @@ export default function NutritionClient({ prenom, recettes, repasStatuts, totalE
   const kcalPct = Math.min((totalKcal / kcalTarget) * 100, 100);
 
   async function toggleRepas(type: RepasType) {
-    const newStatut = statuts[type] === 'fait' ? 'pas_fait' : 'fait';
-    setStatuts(prev => ({ ...prev, [type]: newStatut }));
-    await fetch('/api/nutrition/repas', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const newStatut = statuts[type] === "fait" ? "pas_fait" : "fait";
+    setStatuts((prev) => ({ ...prev, [type]: newStatut }));
+    await fetch("/api/nutrition/repas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ repas_type: type, statut: newStatut }),
     });
+    if (newStatut === "fait") {
+      toast(`🍱 ${REPAS_LABELS[type].label} validé !`, {
+        style: { background: "#0a0a1a", color: "#06b6d4", border: "1px solid #7c3aed" },
+      });
+    }
   }
 
   async function addEau() {
-    setEau(e => e + 1);
-    await fetch('/api/nutrition/eau', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    setEau((e) => e + 1);
+    await fetch("/api/nutrition/eau", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ verres: 1 }),
     });
   }
@@ -75,7 +134,6 @@ export default function NutritionClient({ prenom, recettes, repasStatuts, totalE
   return (
     <div className="min-h-screen bg-black relative">
       <RunesBg />
-
       <div className="relative z-10 pt-12 px-4 safe-bottom">
         {/* Header */}
         <div className="text-center mb-4">
@@ -94,12 +152,17 @@ export default function NutritionClient({ prenom, recettes, repasStatuts, totalE
           <div className="h-3 bg-gray-900 rounded-full border border-gray-700 overflow-hidden">
             <motion.div
               animate={{ width: `${kcalPct}%` }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
               className="h-full rounded-full"
-              style={{ background: 'linear-gradient(90deg, #f59e0b, #ef4444)' }} />
+              style={{ background: "linear-gradient(90deg, #f59e0b, #ef4444)" }}
+            />
           </div>
           <p className="text-xs text-center text-gray-500 mt-1">
-            {totalKcal < 1800 ? '⬇ Trop faible pour la prise de masse' :
-              totalKcal > 2400 ? '⬆ Léger surplus' : '✓ Dans la cible'}
+            {totalKcal < 1800
+              ? "⬇ Trop faible pour la prise de masse"
+              : totalKcal > 2400
+                ? "⬆ Léger surplus"
+                : "✓ Dans la cible"}
           </p>
         </div>
 
@@ -110,19 +173,25 @@ export default function NutritionClient({ prenom, recettes, repasStatuts, totalE
 
         {/* Onglets repas */}
         <div className="grid grid-cols-4 gap-1 mb-4">
-          {REPAS_ORDER.map(type => (
+          {REPAS_ORDER.map((type) => (
             <button
               key={type}
               onClick={() => setActiveRepas(type)}
               className={`flex flex-col items-center gap-0.5 py-2 rounded border transition-all ${
                 activeRepas === type
-                  ? 'border-cyan-500 bg-cyan-950 text-cyan-300'
-                  : 'border-gray-800 bg-gray-950 text-gray-500'
-              }`}>
+                  ? "border-cyan-500 bg-cyan-950 text-cyan-300"
+                  : statuts[type] === "fait"
+                    ? "border-green-800 bg-green-950 text-green-400"
+                    : "border-gray-800 bg-gray-950 text-gray-500"
+              }`}
+            >
               <span className="text-base">{REPAS_LABELS[type].icon}</span>
-              <span className="text-xs" style={{ fontSize: '9px' }}>
+              <span className="text-xs" style={{ fontSize: "9px" }}>
                 {REPAS_LABELS[type].heure}
               </span>
+              {statuts[type] === "fait" && (
+                <span className="text-green-400 text-xs">✓</span>
+              )}
             </button>
           ))}
         </div>
@@ -133,20 +202,28 @@ export default function NutritionClient({ prenom, recettes, repasStatuts, totalE
             key={activeRepas}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}>
-            <SystemWindow title={`${REPAS_LABELS[activeRepas].icon} ${REPAS_LABELS[activeRepas].label} — ${REPAS_LABELS[activeRepas].heure}`} className="w-full mb-4">
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <SystemWindow
+              title={`${REPAS_LABELS[activeRepas].icon} ${REPAS_LABELS[activeRepas].label} — ${REPAS_LABELS[activeRepas].heure}`}
+              className="w-full mb-4"
+            >
               <div className="space-y-3">
                 {/* Statut */}
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-400">~{REPAS_LABELS[activeRepas].kcal} kcal</span>
+                  <span className="text-xs text-gray-400">
+                    ~{REPAS_LABELS[activeRepas].kcal} kcal
+                  </span>
                   <button
                     onClick={() => toggleRepas(activeRepas)}
                     className={`px-4 py-1.5 rounded text-xs font-orbitron uppercase border transition-colors ${
-                      statuts[activeRepas] === 'fait'
-                        ? 'bg-green-900 border-green-600 text-green-300'
-                        : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-violet-600'
-                    }`}>
-                    {statuts[activeRepas] === 'fait' ? '✓ Fait' : 'Marquer fait'}
+                      statuts[activeRepas] === "fait"
+                        ? "bg-green-900 border-green-600 text-green-300"
+                        : "bg-gray-900 border-gray-700 text-gray-400 hover:border-violet-600"
+                    }`}
+                  >
+                    {statuts[activeRepas] === "fait" ? "✓ Fait" : "Marquer fait"}
                   </button>
                 </div>
 
@@ -154,31 +231,35 @@ export default function NutritionClient({ prenom, recettes, repasStatuts, totalE
                 <div>
                   <p className="text-xs text-gray-500 mb-2">Recettes proposées :</p>
                   <div className="space-y-2">
-                    {recettesParType(activeRepas).map(recette => (
+                    {recettesParType(activeRepas).map((recette) => (
                       <div key={recette.id}>
                         <button
-                          onClick={() => setActiveRecette(activeRecette?.id === recette.id ? null : recette)}
-                          className="w-full text-left p-2.5 bg-black border border-gray-800 rounded hover:border-violet-700 transition-colors">
+                          onClick={() =>
+                            setActiveRecette(
+                              activeRecette?.id === recette.id ? null : recette
+                            )
+                          }
+                          className="w-full text-left p-2.5 bg-black border border-gray-800 rounded hover:border-violet-700 transition-colors"
+                        >
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-white font-rajdhani">{recette.nom}</span>
-                            <span className="text-xs text-gold">{recette.calories_approx} kcal</span>
+                            <span className="text-sm text-white font-rajdhani">
+                              {recette.nom}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              ⏱ {recette.temps_preparation}min
+                            </span>
                           </div>
-                          <div className="flex gap-3 mt-1 text-xs text-gray-500">
-                            <span>P: {recette.proteines_approx}g</span>
-                            <span>G: {recette.glucides_approx}g</span>
-                            <span>L: {recette.lipides_approx}g</span>
-                            <span>⏱ {recette.temps_preparation}min</span>
-                          </div>
+                          <NutriBadges recette={recette} />
                         </button>
 
-                        {/* Détail recette */}
                         <AnimatePresence>
                           {activeRecette?.id === recette.id && (
                             <motion.div
                               initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: 'auto' }}
+                              animate={{ opacity: 1, height: "auto" }}
                               exit={{ opacity: 0, height: 0 }}
-                              className="overflow-hidden">
+                              className="overflow-hidden"
+                            >
                               <RecetteDetail recette={recette} />
                             </motion.div>
                           )}
@@ -195,16 +276,16 @@ export default function NutritionClient({ prenom, recettes, repasStatuts, totalE
         {/* Planning semaine */}
         <SystemWindow title="PLANNING SEMAINE" className="w-full mb-6">
           <div className="space-y-2">
-            {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((jour, i) => (
+            {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((jour, i) => (
               <div key={jour} className="flex items-center gap-2 text-xs">
                 <span className="text-gray-500 w-8">{jour}</span>
                 <div className="flex-1 grid grid-cols-4 gap-1">
-                  {REPAS_ORDER.map(type => {
+                  {REPAS_ORDER.map((type) => {
                     const opts = recettesParType(type);
-                    const rec = opts[i % opts.length];
+                    const rec = opts[i % Math.max(opts.length, 1)];
                     return (
                       <div key={type} className="text-xs text-gray-400 truncate">
-                        {rec?.nom.split(' ')[0] || '—'}
+                        {rec?.nom.split(" ")[0] || "—"}
                       </div>
                     );
                   })}
@@ -223,14 +304,15 @@ export default function NutritionClient({ prenom, recettes, repasStatuts, totalE
 function RecetteDetail({ recette }: { recette: Recette }) {
   let ingredients: string[] = [];
   let etapes: string[] = [];
-
   try {
-    ingredients = typeof recette.ingredients === 'string'
-      ? JSON.parse(recette.ingredients)
-      : recette.ingredients as unknown as string[];
-    etapes = typeof recette.etapes === 'string'
-      ? JSON.parse(recette.etapes)
-      : recette.etapes as unknown as string[];
+    ingredients =
+      typeof recette.ingredients === "string"
+        ? JSON.parse(recette.ingredients)
+        : (recette.ingredients as unknown as string[]);
+    etapes =
+      typeof recette.etapes === "string"
+        ? JSON.parse(recette.etapes)
+        : (recette.etapes as unknown as string[]);
   } catch {
     ingredients = [];
     etapes = [];
@@ -239,7 +321,9 @@ function RecetteDetail({ recette }: { recette: Recette }) {
   return (
     <div className="mt-1 p-3 bg-gray-950 border border-gray-800 rounded space-y-3">
       <div>
-        <p className="text-xs text-cyan-400 font-orbitron uppercase tracking-wider mb-1">Ingrédients</p>
+        <p className="text-xs text-cyan-400 font-orbitron uppercase tracking-wider mb-1">
+          Ingrédients
+        </p>
         <ul className="space-y-0.5">
           {ingredients.map((ing, i) => (
             <li key={i} className="text-xs text-gray-300 flex items-start gap-1.5">
@@ -250,7 +334,9 @@ function RecetteDetail({ recette }: { recette: Recette }) {
         </ul>
       </div>
       <div>
-        <p className="text-xs text-cyan-400 font-orbitron uppercase tracking-wider mb-1">Préparation</p>
+        <p className="text-xs text-cyan-400 font-orbitron uppercase tracking-wider mb-1">
+          Préparation
+        </p>
         <ol className="space-y-1">
           {etapes.map((etape, i) => (
             <li key={i} className="text-xs text-gray-300 flex items-start gap-1.5">

@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import type { Grade } from '@/lib/grades';
 import { GRADE_COLORS, GRADE_TITLES } from '@/lib/grades';

@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
 const NAV_ITEMS = [
   { href: '/dashboard', icon: '⬡', label: 'Base' },
