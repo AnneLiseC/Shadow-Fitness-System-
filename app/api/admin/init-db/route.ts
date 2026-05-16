@@ -15,8 +15,8 @@ export async function POST(req: NextRequest) {
 
   const statements = schema
     .split(';')
-    .map(s => s.trim())
-    .filter(s => s.length > 0 && !s.startsWith('--'));
+    .map(s => s.replace(/--[^\n]*/g, '').trim())
+    .filter(s => s.length > 0);
 
   const results: string[] = [];
   for (const stmt of statements) {
