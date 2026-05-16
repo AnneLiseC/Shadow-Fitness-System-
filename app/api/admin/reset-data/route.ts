@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
     `);
     await db.query(`DELETE FROM sessions WHERE user_id = 'anne-lise'`);
     await db.query(`DELETE FROM strava_activites WHERE user_id = 'anne-lise'`);
+    await db.query(`DELETE FROM quetes WHERE user_id = 'anne-lise'`);
     await db.query(`
       DELETE FROM recettes
       WHERE id NOT IN (
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Données fictives supprimées. La page Stats affiche maintenant l\'état vide.',
+      message: 'Données fictives supprimées. Stats affiche maintenant l\'état vide.',
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';

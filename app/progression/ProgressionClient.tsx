@@ -1,5 +1,7 @@
 "use client";
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
+import { eachDayOfInterval, subYears, format, isAfter } from "date-fns";
 import type { Grade } from "@/lib/grades";
 import { GRADE_COLORS } from "@/lib/grades";
 import { formatDistance, formatAllure } from "@/lib/utils";
@@ -324,53 +326,9 @@ export default function ProgressionClient({
           </SystemWindow>
         )}
 
-        {/* Heatmap activité style GitHub */}
-        <SystemWindow title="HEATMAP ACTIVITÉ" className="w-full mb-4">
-          <div className="grid grid-flow-col grid-rows-7 gap-0.5">
-            {Array.from({ length: 28 }, (_, i) => {
-              const d = new Date();
-              d.setDate(d.getDate() - (27 - i));
-              const dateStr = d.toISOString().split("T")[0];
-              const session = sessions.find((s) => s.date === dateStr);
-              const intensity = session
-                ? session.completion_pct >= 100
-                  ? 4
-                  : session.completion_pct >= 75
-                    ? 3
-                    : session.completion_pct >= 50
-                      ? 2
-                      : 1
-                : 0;
-              const colors = [
-                "#111827",
-                "#4c1d95",
-                "#6d28d9",
-                "#7c3aed",
-                "#06b6d4",
-              ];
-              return (
-                <div
-                  key={i}
-                  className="w-4 h-4 rounded-sm"
-                  style={{ background: colors[intensity] }}
-                  title={`${dateStr}: ${session?.completion_pct || 0}%`}
-                />
-              );
-            })}
-          </div>
-          <div className="flex items-center gap-2 mt-2 text-xs text-gray-600">
-            <span>Moins</span>
-            {["#111827", "#4c1d95", "#6d28d9", "#7c3aed", "#06b6d4"].map(
-              (c) => (
-                <div
-                  key={c}
-                  className="w-3 h-3 rounded-sm"
-                  style={{ background: c }}
-                />
-              )
-            )}
-            <span>Plus</span>
-          </div>
+        {/* Heatmap activité — 365 jours glissants */}
+        <SystemWindow title="HEATMAP ACTIVITÉ — 1 AN" className="w-full mb-4">
+          <Heatmap1An />
         </SystemWindow>
 
         {/* Historique douleurs */}
@@ -410,6 +368,159 @@ export default function ProgressionClient({
       </div>
 
       <BottomNav />
+    </div>
+  );
+}
+
+// ── Heatmap 365 jours ─────────────────────────────────────────────────────────
+
+type HeatmapEntry = { completion_pct: number; xp: number; statut: string };
+
+const JOURS_OFF = new Set(["2026-06-13", "2026-06-20", "2026-06-21"]);
+const MOIS_FR = ["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"];
+const CELL = 12; // px
+const GAP = 2;   // px
+const STEP = CELL + GAP; // 14px per column
+
+function getCouleur(dateStr: string, data: Record<string, HeatmapEntry>, aujourdhui: Date, jour: Date): string {
+  if (isAfter(jour, aujourdhui)) return "#000000";
+  if (JOURS_OFF.has(dateStr)) return "#1e3a5f";
+  const s = data[dateStr];
+  if (!s) return "#1a1a2e";
+  const p = s.completion_pct;
+  if (p < 50) return "#2d1b69";
+  if (p < 80) return "#5b21b6";
+  if (p < 95) return "#7c3aed";
+  return "#06b6d4";
+}
+
+function getLabel(dateStr: string, data: Record<string, HeatmapEntry>): string {
+  const dl = new Date(dateStr + "T12:00:00").toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  if (JOURS_OFF.has(dateStr)) return `${dl}\nJour de repos programmé`;
+  const s = data[dateStr];
+  if (!s) return `${dl}\nAucune activité`;
+  return `${dl}\nSéance complète — ${s.completion_pct}%\n${s.xp} XP gagnés`;
+}
+
+function Heatmap1An() {
+  const [data, setData] = useState<Record<string, HeatmapEntry>>({});
+  const [loading, setLoading] = useState(true);
+  const [tooltip, setTooltip] = useState<{ label: string } | null>(null);
+
+  const aujourdhui = new Date();
+  const ilYaUnAn = subYears(aujourdhui, 1);
+
+  useEffect(() => {
+    const from = format(ilYaUnAn, "yyyy-MM-dd");
+    const to = format(aujourdhui, "yyyy-MM-dd");
+    fetch(`/api/stats/heatmap?from=${from}&to=${to}`)
+      .then((r) => r.json())
+      .then((d) => { setData(d); setLoading(false); })
+      .catch(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const tousLesJours = eachDayOfInterval({ start: ilYaUnAn, end: aujourdhui });
+
+  // Groupe en colonnes de 7 (lundi→dimanche), padding si nécessaire
+  const semaines: (Date | null)[][] = [];
+  let week: (Date | null)[] = [];
+  const firstDow = tousLesJours[0].getDay(); // 0=dim
+  const pad = firstDow === 0 ? 6 : firstDow - 1;
+  for (let i = 0; i < pad; i++) week.push(null);
+  for (const jour of tousLesJours) {
+    week.push(jour);
+    if (week.length === 7) { semaines.push([...week]); week = []; }
+  }
+  if (week.length > 0) {
+    while (week.length < 7) week.push(null);
+    semaines.push(week);
+  }
+
+  // Labels mois : 1 label par mois, positionné à la première semaine du mois
+  const moisLabels: { label: string; weekIdx: number }[] = [];
+  let lastMonth = -1;
+  semaines.forEach((semaine, weekIdx) => {
+    const first = semaine.find((d) => d !== null);
+    if (!first) return;
+    const m = first.getMonth();
+    if (m !== lastMonth) {
+      moisLabels.push({ label: MOIS_FR[m], weekIdx });
+      lastMonth = m;
+    }
+  });
+
+  const gridWidth = semaines.length * STEP;
+
+  if (loading) {
+    return <p className="text-gray-600 text-xs text-center py-6 italic">Chargement...</p>;
+  }
+
+  return (
+    <div>
+      {/* Tooltip */}
+      {tooltip && (
+        <div
+          className="mb-3 p-2 cursor-pointer"
+          style={{ background: "#0a0a1a", border: "1px solid #7c3aed" }}
+          onClick={() => setTooltip(null)}
+        >
+          {tooltip.label.split("\n").map((line, i) => (
+            <p key={i} className="text-xs" style={{ color: i === 0 ? "#06b6d4" : "#94a3b8" }}>
+              {line}
+            </p>
+          ))}
+        </div>
+      )}
+
+      <div className="overflow-x-auto">
+        {/* Labels mois */}
+        <div className="relative mb-1" style={{ height: 14, minWidth: gridWidth }}>
+          {moisLabels.map(({ label, weekIdx }) => (
+            <span
+              key={`${label}-${weekIdx}`}
+              className="absolute text-gray-500"
+              style={{ left: weekIdx * STEP, fontSize: 9 }}
+            >
+              {label}
+            </span>
+          ))}
+        </div>
+
+        {/* Grille */}
+        <div className="flex" style={{ gap: GAP, minWidth: gridWidth }}>
+          {semaines.map((semaine, wi) => (
+            <div key={wi} className="flex flex-col" style={{ gap: GAP }}>
+              {semaine.map((jour, di) => {
+                if (!jour) {
+                  return <div key={di} style={{ width: CELL, height: CELL }} />;
+                }
+                const dateStr = format(jour, "yyyy-MM-dd");
+                const bg = getCouleur(dateStr, data, aujourdhui, jour);
+                return (
+                  <div
+                    key={di}
+                    className="rounded-sm cursor-pointer"
+                    style={{ width: CELL, height: CELL, backgroundColor: bg }}
+                    onClick={() => setTooltip({ label: getLabel(dateStr, data) })}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
+
+        {/* Légende */}
+        <div className="flex items-center gap-1.5 mt-2 flex-wrap" style={{ fontSize: 10, color: "#6b7280" }}>
+          <span>Moins</span>
+          {["#1a1a2e", "#2d1b69", "#5b21b6", "#7c3aed", "#06b6d4"].map((c) => (
+            <div key={c} className="rounded-sm" style={{ width: CELL, height: CELL, backgroundColor: c }} />
+          ))}
+          <span>Plus</span>
+          <div className="rounded-sm ml-2" style={{ width: CELL, height: CELL, backgroundColor: "#1e3a5f" }} />
+          <span>Jour off</span>
+        </div>
+      </div>
     </div>
   );
 }

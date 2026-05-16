@@ -203,7 +203,7 @@ function SeanceInner({
   const courseLevel = PROGRESSION_COURSE[Math.min(courseNiveau - 1, PROGRESSION_COURSE.length - 1)];
 
   function initSets(obj: number, count: number) {
-    return Array.from({ length: count }, () => ({ realise: obj, objectif: obj }));
+    return Array.from({ length: count }, () => ({ realise: 0, objectif: obj }));
   }
 
   const [logs, setLogs] = useState<Record<ExerciceType, ExerciceLog>>({
