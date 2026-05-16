@@ -1,8 +1,66 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="152" height="152" viewBox="0 0 152 152">
-  <rect width="152" height="152" fill="#000000"/>
-  <polygon points="131.28706177759858,44.080000000000005 131.28706177759858,107.91999999999999 76,139.84 20.712938222401434,107.91999999999999 20.71293822240144,44.08 75.99999999999999,12.160000000000004" fill="#7c3aed" opacity="0.8"/>
-  <polygon points="131.28706177759858,44.080000000000005 131.28706177759858,107.91999999999999 76,139.84 20.712938222401434,107.91999999999999 20.71293822240144,44.08 75.99999999999999,12.160000000000004" fill="none" stroke="#06b6d4" stroke-width="3.04"/>
-  <text x="76" y="88.16" text-anchor="middle"
-    font-size="42.56" fill="#ffffff" font-family="monospace" font-weight="bold">S</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="152" height="152">
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="b"></feGaussianBlur>
+      <feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+    </filter>
+    <filter id="bloom" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="18" result="b"></feGaussianBlur>
+      <feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+    </filter>
+    <filter id="runeglow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.2" result="b"></feGaussianBlur>
+      <feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+    </filter>
+    <radialGradient id="bg" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#1a0a3a"></stop>
+      <stop offset="35%" stop-color="#0a0418"></stop>
+      <stop offset="100%" stop-color="#000000"></stop>
+    </radialGradient>
+    <linearGradient id="gemFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c084fc"></stop>
+      <stop offset="45%" stop-color="#7c3aed"></stop>
+      <stop offset="100%" stop-color="#2e1065"></stop>
+    </linearGradient>
+    <linearGradient id="gemFacet" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e9d5ff" stop-opacity="0.95"></stop>
+      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0.1"></stop>
+    </linearGradient>
+    <radialGradient id="portal" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7c3aed" stop-opacity="0"></stop>
+      <stop offset="70%" stop-color="#7c3aed" stop-opacity="0.45"></stop>
+      <stop offset="92%" stop-color="#22d3ee" stop-opacity="0.35"></stop>
+      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+
+  <rect width="512" height="512" fill="#000"></rect>
+  <rect width="512" height="512" fill="url(#bg)"></rect>
+
+  <circle cx="256" cy="256" r="220" fill="url(#portal)" opacity="0.9" filter="url(#bloom)"></circle>
+
+  <line x1="446" y1="256" x2="460" y2="256" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" opacity="0.95" filter="url(#runeglow)"></line><line x1="351" y1="420.54482671904333" x2="358" y2="432.6691823720255" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" opacity="0.95" filter="url(#runeglow)"></line><line x1="161.00000000000006" y1="420.5448267190434" x2="154.00000000000006" y2="432.6691823720255" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" opacity="0.95" filter="url(#runeglow)"></line><line x1="66" y1="256" x2="52" y2="256" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" opacity="0.95" filter="url(#runeglow)"></line><line x1="160.99999999999991" y1="91.4551732809567" x2="153.99999999999991" y2="79.33081762797457" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" opacity="0.95" filter="url(#runeglow)"></line><line x1="350.9999999999999" y1="91.45517328095659" x2="357.9999999999999" y2="79.33081762797443" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" opacity="0.95" filter="url(#runeglow)"></line>
+  <line x1="420.5448267190434" y1="351" x2="427.47302994931886" y2="355" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round" opacity="0.7" filter="url(#runeglow)"></line><line x1="256" y1="446" x2="256" y2="454" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round" opacity="0.7" filter="url(#runeglow)"></line><line x1="91.4551732809567" y1="351.00000000000006" x2="84.52697005068117" y2="355.00000000000006" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round" opacity="0.7" filter="url(#runeglow)"></line><line x1="91.45517328095661" y1="161.00000000000006" x2="84.52697005068111" y2="157.00000000000006" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round" opacity="0.7" filter="url(#runeglow)"></line><line x1="255.99999999999997" y1="66" x2="255.99999999999997" y2="58" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round" opacity="0.7" filter="url(#runeglow)"></line><line x1="420.5448267190433" y1="160.99999999999991" x2="427.4730299493188" y2="156.99999999999991" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round" opacity="0.7" filter="url(#runeglow)"></line>
+
+  <path d="M256,90L399.7602170282168,173L399.76021702821686,339L256,422L112.2397829717832,339.00000000000006L112.23978297178311,173.0000000000001Z" fill="none" stroke="#7c3aed" stroke-width="2" opacity="0.5" filter="url(#bloom)"></path>
+  <path d="M256,106L385.9038105676658,181L385.9038105676658,331L256,406L126.09618943233423,331.00000000000006L126.09618943233414,181.00000000000009Z" fill="url(#gemFill)" stroke="#a855f7" stroke-width="3" filter="url(#glow)"></path>
+
+  <line x1="256" y1="256" x2="256" y2="106" stroke="#f5e9ff" stroke-width="1.8" opacity="0.5"></line><line x1="256" y1="256" x2="385.9038105676658" y2="181" stroke="#f5e9ff" stroke-width="1.8" opacity="0.5"></line><line x1="256" y1="256" x2="385.9038105676658" y2="331" stroke="#f5e9ff" stroke-width="1.8" opacity="0.5"></line><line x1="256" y1="256" x2="256" y2="406" stroke="#f5e9ff" stroke-width="1.8" opacity="0.5"></line><line x1="256" y1="256" x2="126.09618943233423" y2="331.00000000000006" stroke="#f5e9ff" stroke-width="1.8" opacity="0.5"></line><line x1="256" y1="256" x2="126.09618943233414" y2="181.00000000000009" stroke="#f5e9ff" stroke-width="1.8" opacity="0.5"></line>
+
+  <path d="M 126.09618943233414 181.00000000000009 L 256 106 L 385.9038105676658 181 L 256 256 Z" fill="url(#gemFacet)" opacity="0.65"></path>
+
+  <path d="M256,218L288.9089653438087,237L288.9089653438087,275L256,294L223.09103465619134,275L223.0910346561913,237.00000000000003Z" fill="none" stroke="#22d3ee" stroke-width="2" filter="url(#glow)"></path>
+  <circle cx="256" cy="256" r="6" fill="#fff" filter="url(#glow)"></circle>
+
+  <path d="M 385.9038105676658 331 L 256 406 L 126.09618943233423 331.00000000000006" fill="none" stroke="#22d3ee" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"></path>
+
+  <circle cx="216" cy="201" r="8" fill="#fff" opacity="0.95" filter="url(#glow)"></circle>
+  <ellipse cx="226" cy="211" rx="20" ry="8" fill="#fff" opacity="0.15" transform="rotate(-30 226 211)"></ellipse>
+
+  <g filter="url(#glow)">
+    <circle cx="80" cy="90" r="3" fill="#a855f7"></circle>
+    <circle cx="430" cy="100" r="2.5" fill="#22d3ee"></circle>
+    <circle cx="90" cy="420" r="2.5" fill="#22d3ee"></circle>
+    <circle cx="432" cy="420" r="3" fill="#a855f7"></circle>
+  </g>
 </svg>
