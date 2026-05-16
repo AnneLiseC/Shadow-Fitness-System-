@@ -95,8 +95,6 @@ export default function BodyMapSVG({ activeExercices = [], size = 200 }: BodyMap
     return 0.3;
   }
 
-  const scale = size / 300;
-
   return (
     <div className="flex flex-col items-center gap-3">
       {/* Toggle */}

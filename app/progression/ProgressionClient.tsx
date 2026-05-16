@@ -1,7 +1,7 @@
 'use client';
 import { motion } from 'framer-motion';
 import type { Grade } from '@/lib/grades';
-import { GRADE_COLORS, getXPProgress, getXPForNextGrade, XP_THRESHOLDS } from '@/lib/grades';
+import { GRADE_COLORS } from '@/lib/grades';
 import { formatDistance, formatAllure } from '@/lib/utils';
 import SystemWindow from '@/components/ui/SystemWindow';
 import BottomNav from '@/components/ui/BottomNav';
@@ -36,7 +36,6 @@ export default function ProgressionClient({
 }: ProgressionClientProps) {
   const gradeColor = GRADE_COLORS[grade];
   const completedSessions = sessions.filter(s => s.statut === 'complete').length;
-  const totalXP = sessions.reduce((s, se) => s + (se.xp_gagne || 0), 0);
 
   const maxDist = courses.length > 0 ? Math.max(...courses.map(c => Number(c.distance_m))) : 1;
 

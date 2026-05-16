@@ -1,11 +1,9 @@
 'use client';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
 import type { Grade } from '@/lib/grades';
 import {
-  getPompesLevel, getAbdosLevel, getSquatsLevel, getPoignetsLevel,
-  RENFORCEMENT_POIGNETS
+  getPompesLevel, getAbdosLevel, getSquatsLevel,
 } from '@/lib/progression';
 import { formatDistance, formatAllure } from '@/lib/utils';
 import BodyMapSVG from '@/components/svgs/BodyMapSVG';
@@ -37,13 +35,12 @@ interface SeanceClientProps {
   stravaToday: { distance_m: number; duree_secondes: number; allure_moyenne: number } | null;
 }
 
-function SeanceInner({ userId, prenom, grade, xp, phase, isOff, niveaux, alerteDouleur, sessionToday, stravaToday }: SeanceClientProps) {
+function SeanceInner({ prenom, grade, isOff, niveaux, alerteDouleur, sessionToday, stravaToday }: SeanceClientProps) {
   const { play } = useSound();
 
   const pompesNiveau = niveaux['pompes'] || 1;
   const abdosNiveau = niveaux['abdos'] || 1;
   const squatsNiveau = niveaux['squats'] || 1;
-  const poignetsNiveau = niveaux['poignets'] || 1;
 
   const pompesLevel = getPompesLevel(pompesNiveau);
   const abdosLevel = getAbdosLevel(abdosNiveau);

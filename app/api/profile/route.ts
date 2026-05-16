@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stackServerApp } from '@/lib/stack';
 import { query, queryOne } from '@/lib/db';
-import { getGradeFromXP } from '@/lib/grades';
 
 export async function POST(req: NextRequest) {
   const user = await stackServerApp.getUser();
@@ -30,7 +29,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ success: true });
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   const user = await stackServerApp.getUser();
   if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
 

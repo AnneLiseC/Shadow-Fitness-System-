@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import type { Grade } from '@/lib/grades';
@@ -45,7 +45,6 @@ function DashboardInner(props: DashboardClientProps) {
   const gradeTitle = GRADE_TITLES[grade];
 
   const targetEau = 10; // 2.5L = 10 verres de 250ml (3L jours entrainement = 12)
-  const isSeanceDay = !isOff;
   const seanceComplete = sessionToday?.statut === 'complete';
 
   async function addEau() {

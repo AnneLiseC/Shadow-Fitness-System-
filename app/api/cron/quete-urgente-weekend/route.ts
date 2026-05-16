@@ -13,7 +13,6 @@ export async function GET(req: NextRequest) {
 
   const now = nowParis();
   const today = todayISO();
-  const hour = now.getHours();
   const dow = now.getDay();
 
   const isWeekend = dow === 0 || dow === 6;

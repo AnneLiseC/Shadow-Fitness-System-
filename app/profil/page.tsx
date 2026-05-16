@@ -1,8 +1,8 @@
 export const dynamic = 'force-dynamic';
 import { stackServerApp } from '@/lib/stack';
 import { redirect } from 'next/navigation';
-import { queryOne, query } from '@/lib/db';
-import { getGradeFromXP, GRADE_TITLES } from '@/lib/grades';
+import { queryOne } from '@/lib/db';
+import { getGradeFromXP } from '@/lib/grades';
 import ProfilClient from './ProfilClient';
 
 export default async function ProfilPage() {

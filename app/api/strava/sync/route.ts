@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stackServerApp } from '@/lib/stack';
 import { syncStravaActivities } from '@/lib/strava';
 
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   const user = await stackServerApp.getUser();
   if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
 
