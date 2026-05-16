@@ -4,6 +4,7 @@ import { StackServerApp } from '@stackframe/stack';
 const CONFIG = {
   tokenStore: 'nextjs-cookie' as const,
   urls: {
+    handler: '/handler',
     signIn: '/onboarding',
     afterSignIn: '/dashboard',
     afterSignUp: '/onboarding',
